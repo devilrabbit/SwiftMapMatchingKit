@@ -15,6 +15,6 @@ public protocol Path {
     var startPoint: TPoint { get }
     var endPoint: TPoint { get }
     var edges: [TEdge] { get }
-    var length: Float { get }
+    var length: Double { get }
     func cost(_ costFunc: ((TEdge)->(Double))) -> Double
 }

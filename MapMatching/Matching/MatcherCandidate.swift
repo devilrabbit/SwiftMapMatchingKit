@@ -33,6 +33,6 @@ public final class MatcherCandidate: StateCandidate {
     }
     
     public static func == (lhs: MatcherCandidate, rhs: MatcherCandidate) -> Bool {
-        return lhs.point == rhs.point
+        return lhs === rhs
     }
 }

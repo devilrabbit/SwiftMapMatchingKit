@@ -16,8 +16,8 @@ public struct RoadInfo {
     public var target: Int64
     public var oneWay: Bool
     public var type: UInt16
-    public var priority: Float
-    public var maxSpeedForward: Float
-    public var maxSpeedBackward: Float
+    public var priority: Double
+    public var maxSpeedForward: Double
+    public var maxSpeedBackward: Double
     public var length: Double
 }

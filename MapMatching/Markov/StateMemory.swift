@@ -36,7 +36,7 @@ public protocol StateMemory {
     
     /// Gets state vector of the last update.
     /// - returns: State vector of the last update, or an empty set if there hasn't been any update yet.
-    func vector() -> Set<TCandidate>
+    func vector() -> [TCandidate]
     
     /// Gets a state estimate which is the most likely state candidate of the last update, with
     /// respect to state candidate's filter probability (<see cref="AbstractStateCandidate{TCandidate, TTransition, TSample}.Filtprob"/>).

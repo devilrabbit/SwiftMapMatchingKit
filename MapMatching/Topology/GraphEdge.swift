@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol GraphEdge: Edge {
+public protocol GraphEdge: class, Edge {
     associatedtype TEdge: GraphEdge
     
     var id: Int64 { get }
@@ -36,16 +36,10 @@ extension GraphEdge {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-        hasher.combine(source)
-        hasher.combine(target)
-        hasher.combine(weight)
     }
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        guard lhs.id == rhs.id else { return false }
-        guard lhs.source == rhs.source else { return false }
-        guard lhs.target == rhs.target else { return false }
-        guard lhs.weight == rhs.weight else { return false }
-        return true
+        if lhs === rhs { return true }
+        return lhs.id == rhs.id
     }
 }

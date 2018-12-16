@@ -105,15 +105,15 @@ open class AbstractFilter<Candidate: StateCandidate, TTransition, TSample>: Filt
     /// - parameter previous: Previous measurement sample <i>z<sub>t-1</sub></i>.
     /// - parameter sample: Measurement sample <i>z<sub>t</sub></i>.
     /// - returns: State vector <i>S<sub>t</sub></i>, which may be empty if an HMM break occured.
-    public func execute(predecessors: [TCandidate], previous: TSample, sample: TSample) -> [TCandidate] {
+    public func execute(predecessors: [TCandidate], previous: TSample?, sample: TSample) -> [TCandidate] {
         var result = Set<TCandidate>()
         let candidates = self.candidates(predecessors: predecessors, sample: sample)
         //Logger.verbose("{} state candidates", candidates.size())
         
         var normsum = 0.0
         
-        if predecessors.count > 0 {
-            let states = candidates.map { $0.candidate }.unique()
+        if let previous = previous, predecessors.count > 0 {
+            let states = Array(Set(candidates.map { $0.candidate }))
             var transitions = self.transitions(
                 predecessors: SampleCandidates(sample: previous, candidates: predecessors),
                 candidates: SampleCandidates(sample: sample, candidates: states)
@@ -180,16 +180,5 @@ open class AbstractFilter<Candidate: StateCandidate, TTransition, TSample>: Filt
         //Logger.verbose("{0} state candidates for state update", result.count)
         
         return Array(result)
-    }
-}
-
-extension Array where Element: Equatable {
-    
-    func unique() -> [Element] {
-        var r = [Element]()
-        for i in self {
-            r += !r.contains(i) ? [i] : []
-        }
-        return r
     }
 }

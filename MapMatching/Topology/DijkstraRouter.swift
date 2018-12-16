@@ -55,18 +55,16 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
         /*
          * Setup data structures
          */
-        var priorities = PriorityQueue<RouteMark<TEdge>>(ascending: true)
-        var entries = [TEdge : RouteMark<TEdge>]()
-        var finishs = [TPoint : RouteMark<TEdge>]()
-        var reaches = [RouteMark<TEdge> : TPoint]()
-        var starts = [RouteMark<TEdge> : TPoint]()
+        var priorities = PriorityQueue<Mark<TEdge>>(ascending: true)
+        var entries = [TEdge : Mark<TEdge>]()
+        var finishs = [TPoint : Mark<TEdge>]()
+        var reaches = [Mark<TEdge> : TPoint]()
+        var starts = [Mark<TEdge> : TPoint]()
         
         /*
          * Initialize map of edges with start points
          */
         for source in sources {
-            print(source.edge.id)
-            
             // initialize sources as start edges
             let startcost = (1.0 - source.fraction) * cost(source.edge)
             let startbound = (1.0 - source.fraction) * (bound?(source.edge) ?? 0)
@@ -86,7 +84,7 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
                     
                     //Logger.debug("reached target {0} with start edge {1} from {2} to {3} with {4} cost", target, source.Edge.Id, source.Fraction, target.Fraction, reachcost)
                     
-                    let reach = RouteMark<TEdge>(markedEdge: source.edge, predecessorEdge: nil, cost: reachcost, boundingCost: reachbound)
+                    let reach = Mark<TEdge>(markedEdge: source.edge, predecessorEdge: nil, cost: reachcost, boundingCost: reachbound)
                     reaches[reach] = target
                     starts[reach] = source
                     priorities.push(reach)
@@ -96,7 +94,7 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
             if let start = entries[source.edge] {
                 if startcost < start.cost {
                     //Logger.debug("update source {0} with start edge {1} and fraction {2} with {3} cost", source, source.Edge.Id, source.Fraction, startcost)
-                    let start = RouteMark<TEdge>(markedEdge: source.edge, predecessorEdge: nil, cost: startcost, boundingCost: startbound)
+                    let start = Mark<TEdge>(markedEdge: source.edge, predecessorEdge: nil, cost: startcost, boundingCost: startbound)
                     entries[source.edge] = start
                     starts[start] = source
                     priorities.remove(start)
@@ -104,7 +102,7 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
                 }
             } else {
                 //Logger.debug("add source {0} with start edge {1} and fraction {2} with {3} cost", source, source.Edge.Id, source.Fraction, startcost)
-                let start = RouteMark<TEdge>(markedEdge: source.edge, predecessorEdge: nil, cost: startcost, boundingCost: startbound)
+                let start = Mark<TEdge>(markedEdge: source.edge, predecessorEdge: nil, cost: startcost, boundingCost: startbound)
                 entries[source.edge] = start
                 starts[start] = source
                 priorities.push(start)
@@ -169,7 +167,7 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
                         
                         //Logger.debug("reached target {0} with successor edge {1} and fraction {2} with {3} cost", targetEdge, successor.Id, targetEdge.Fraction, reachcost)
                         
-                        let reach = RouteMark<TEdge>(markedEdge: successor, predecessorEdge: current.markedEdge, cost: reachcost, boundingCost: reachbound)
+                        let reach = Mark<TEdge>(markedEdge: successor, predecessorEdge: current.markedEdge, cost: reachcost, boundingCost: reachbound)
                         reaches[reach] = targetEdge
                         priorities.push(reach)
                     }
@@ -177,7 +175,7 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
                 
                 if !entries.keys.contains(successor) {
                     // Logger.debug("added successor edge {0} with {1} cost", successor.Id, succcost)
-                    let mark = RouteMark<TEdge>(markedEdge: successor, predecessorEdge: current.markedEdge, cost: succcost, boundingCost: succbound)
+                    let mark = Mark<TEdge>(markedEdge: successor, predecessorEdge: current.markedEdge, cost: succcost, boundingCost: succbound)
                     entries[successor] = mark
                     priorities.push(mark)
                 }
@@ -190,7 +188,7 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
             if finishs.keys.contains(targetPoint) {
                 var path = [TEdge]()
                 var iterator = finishs[targetPoint]
-                var start: RouteMark<TEdge>? = RouteMark<TEdge>.empty
+                var start: Mark<TEdge>? = Mark<TEdge>()
                 
                 while !(iterator?.isEmpty ?? true) {
                     if let edge = iterator?.markedEdge {
@@ -198,9 +196,9 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
                     }
                     start = iterator
                     if let edge = iterator?.predecessorEdge {
-                        iterator = entries[edge] ?? RouteMark<TEdge>.empty
+                        iterator = entries[edge] ?? Mark<TEdge>()
                     } else {
-                        iterator = RouteMark<TEdge>.empty
+                        iterator = Mark<TEdge>()
                     }
                 }
                 
@@ -214,4 +212,52 @@ public class DijkstraRouter<TEdge, TPoint: EdgePoint> : GraphRouter where TPoint
 
         return paths
     }
+}
+
+private struct Mark<TEdge : GraphEdge>: Comparable, Hashable {
+    
+    public var markedEdge: TEdge?
+    public var predecessorEdge: TEdge?
+    public var cost: Double
+    public var boundingCost: Double
+    
+    public var isEmpty: Bool {
+        return cost.isNaN
+    }
+    
+    public init() {
+        self.init(markedEdge: nil, predecessorEdge: nil, cost: .nan, boundingCost: .nan)
+    }
+    
+    public init(markedEdge: TEdge?, predecessorEdge: TEdge?, cost: Double, boundingCost: Double) {
+        self.markedEdge = markedEdge
+        self.predecessorEdge = predecessorEdge
+        self.cost = cost
+        self.boundingCost = boundingCost
+    }
+    
+    static func < (lhs: Mark<TEdge>, rhs: Mark<TEdge>) -> Bool {
+        if lhs.isEmpty {
+            return false
+        }
+        if rhs.isEmpty  {
+            return true
+        }
+        return lhs.cost < rhs.cost
+    }
+    
+    static func == (lhs: Mark<TEdge>, rhs: Mark<TEdge>) -> Bool {
+        return lhs.markedEdge == rhs.markedEdge &&
+            lhs.predecessorEdge == rhs.predecessorEdge &&
+            lhs.cost == rhs.cost
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(markedEdge)
+        if let edge = predecessorEdge {
+            hasher.combine(edge)
+        }
+        hasher.combine(cost)
+    }
+    
 }

@@ -37,11 +37,11 @@ public class Road: GraphEdge {
         return roadInfo.length
     }
     
-    public var maxSpeed: Float {
+    public var maxSpeed: Double {
         return heading == .forward ? roadInfo.maxSpeedForward : roadInfo.maxSpeedBackward
     }
     
-    public var priority: Float {
+    public var priority: Double {
         return self.roadInfo.priority
     }
 }

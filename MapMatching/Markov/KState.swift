@@ -155,11 +155,11 @@ public class KState<Candidate: StateCandidate, TTransition, TSample: Sample> : S
         }
     }
                 
-    public func vector() -> Set<TCandidate> {
+    public func vector() -> [TCandidate] {
         if _sequence.count == 0 {
-            return Set<TCandidate>()
+            return []
         }
-        return Set<TCandidate>(_sequence.last?.candidates ?? [])
+        return Array(Set(_sequence.last?.candidates ?? []))
     }
                 
     public func estimate() -> TCandidate? {

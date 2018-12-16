@@ -51,7 +51,7 @@ public final class Turf {
     public func buffer<G: GeoJSONConvertible>(_ feature: G, distance: Double, units: Units = .meters) -> Polygon? {
         
         let fn = self.context?.objectForKeyedSubscript("buffer")!
-        let args: [AnyObject] = [feature.geoJSONRepresentation() as AnyObject, distance as AnyObject, ["units": units.rawValue as AnyObject, "steps": 90 as AnyObject] as AnyObject]
+        let args: [AnyObject] = [feature.toDictionary() as AnyObject, distance as AnyObject, ["units": units.rawValue as AnyObject, "steps": 90 as AnyObject] as AnyObject]
         
         if let bufferedGeoJSON = fn?.call(withArguments: args)?.toDictionary() {
             return Polygon(dictionary: bufferedGeoJSON)
@@ -66,7 +66,7 @@ public final class Turf {
     public func bbox<G: GeoJSONConvertible>(_ geojson: G) -> Rect2D? {
         
         let fn = self.context?.objectForKeyedSubscript("bbox")
-        let args: [AnyObject] = [geojson.geoJSONRepresentation() as AnyObject]
+        let args: [AnyObject] = [geojson.toDictionary() as AnyObject]
         
         if let result = fn?.call(withArguments: args)?.toArray() as? [Double] {
             return Rectangle2D(minX: result[0], minY: result[1], maxX: result[2], maxY: result[3])
@@ -83,7 +83,7 @@ public final class Turf {
     public func kinks(_ feature: Polygon) -> FeatureCollection? {
         
         let fn = self.context?.objectForKeyedSubscript("kinks")!
-        let args: [AnyObject] = [feature.geoJSONRepresentation() as AnyObject]
+        let args: [AnyObject] = [feature.toDictionary() as AnyObject]
         
         if let kinks = fn?.call(withArguments: args)?.toDictionary() {
             return FeatureCollection(dictionary: kinks)
@@ -99,7 +99,7 @@ public final class Turf {
     public func length<G: GeoJSONConvertible>(_ geojson: G, units: Units = .kilometers) -> Double? {
         
         let fn = self.context?.objectForKeyedSubscript("length")
-        let args: [AnyObject] = [geojson.geoJSONRepresentation() as AnyObject, ["units": units.rawValue as AnyObject] as AnyObject]
+        let args: [AnyObject] = [geojson.toDictionary() as AnyObject, ["units": units.rawValue as AnyObject] as AnyObject]
         
         return fn?.call(withArguments: args)?.toDouble()
     }
@@ -112,7 +112,7 @@ public final class Turf {
     public func lineIntersect(_ line1: LineString, _ line2: LineString) -> FeatureCollection? {
         
         let fn = self.context?.objectForKeyedSubscript("lineIntersect")!
-        let args: [AnyObject] = [line1.geoJSONRepresentation() as AnyObject, line2.geoJSONRepresentation() as AnyObject]
+        let args: [AnyObject] = [line1.toDictionary() as AnyObject, line2.toDictionary() as AnyObject]
         
         if let intersect = fn?.call(withArguments: args)?.toDictionary() {
             return FeatureCollection(dictionary: intersect)
@@ -129,7 +129,7 @@ public final class Turf {
     public func destination(point: Point, distanceMeters: Double, bearing: Double, units: Units = .meters) -> Point? {
         
         let fn = self.context?.objectForKeyedSubscript("destination")!
-        let args: [AnyObject] = [point.geoJSONRepresentation()  as AnyObject, distanceMeters as AnyObject, bearing as AnyObject, ["units": units.rawValue as AnyObject] as AnyObject]
+        let args: [AnyObject] = [point.toDictionary()  as AnyObject, distanceMeters as AnyObject, bearing as AnyObject, ["units": units.rawValue as AnyObject] as AnyObject]
         
         if let destinationPoint = fn?.call(withArguments: args)?.toDictionary() {
             return Point(dictionary: destinationPoint)

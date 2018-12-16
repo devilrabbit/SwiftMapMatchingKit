@@ -3,7 +3,7 @@
 //  MapMatching
 //
 //  Created by devilrabbit on 2018/10/09.
-//  Copyright (c) 2018年 devilrabbit. All rights reserved.
+//  Copyright (c) 2018 devilrabbit. All rights reserved.
 //
 
 import UIKit

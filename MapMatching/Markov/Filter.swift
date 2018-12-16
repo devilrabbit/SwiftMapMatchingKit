@@ -13,5 +13,5 @@ public protocol Filter {
     associatedtype TTransition where TCandidate.TTransition == TTransition
     associatedtype TSample where TCandidate.TSample == TSample
     
-    func execute(predecessors: [TCandidate], previous: TSample, sample: TSample) -> [TCandidate]
+    func execute(predecessors: [TCandidate], previous: TSample?, sample: TSample) -> [TCandidate]
 }

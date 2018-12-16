@@ -18,7 +18,7 @@ public final class Route: Path, Equatable {
         return Route.getEdges(startPoint, endPoint, _edges)
     }
     
-    public private(set) var length: Float
+    public private(set) var length: Double
     
     public init(startPoint: RoadPoint, endPoint: RoadPoint, edges: [Road]) {
         self.startPoint = startPoint
@@ -49,11 +49,11 @@ public final class Route: Path, Equatable {
         return lhs.edges == rhs.edges
     }
     
-    private static func computeLength(_ startPoint: RoadPoint, _ endPoint: RoadPoint, _ edges: [Road]) -> Float {
+    private static func computeLength(_ startPoint: RoadPoint, _ endPoint: RoadPoint, _ edges: [Road]) -> Double {
         let edges_ = getEdges(startPoint, endPoint, edges)
         let totalLength = edges_.map { $0.length }.reduce(0, +)
-        let d = totalLength - (startPoint.fraction * startPoint.edge.length) - ((1.0 - endPoint.fraction) * endPoint.edge.length)
-        return Float(d)
+        let length = totalLength - (startPoint.fraction * startPoint.edge.length) - ((1.0 - endPoint.fraction) * endPoint.edge.length)
+        return length
     }
     
     private static func getEdges(_ startPoint: RoadPoint, _ endPoint: RoadPoint, _ edges: [Road]) -> [Road] {

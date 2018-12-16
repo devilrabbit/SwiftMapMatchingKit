@@ -88,14 +88,14 @@ open class AdjacencyGraph<E>: AdjacencyListGraph<Int64, E> where E: GraphEdge, E
         for edges in self.adjacencyList.values {
             if edges.count > 1 {
                 for i in 1..<edges.count {
-                    var prevEdge = edges[i - 1]
+                    let prevEdge = edges[i - 1]
                     prevEdge.neighbor = edges[i] as? E.TEdge
                     prevEdge.successor = self.adjacencyList[prevEdge.target]?.first as? E.TEdge
                 }
             }
             
             if let lastEdge = edges.last {
-                var edge = lastEdge
+                let edge = lastEdge
                 edge.neighbor = edges.first as? E.TEdge
                 edge.successor = self.adjacencyList[lastEdge.target]?.first as? E.TEdge
             }
